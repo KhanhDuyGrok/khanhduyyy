@@ -1,34 +1,39 @@
+-- Khởi tạo biến global
 if not getgenv().FastAttack then
     getgenv().FastAttack = true
 end
 
-if getgenv().FastAttack then
-    local _ENV = getgenv()
+-- Bắt đầu script chính
+pcall(function()
+    if getgenv().FastAttack then
+        local _ENV = getgenv()
 
-    local function SafeWaitForChild(parent, childName)
-        local success, result = pcall(function()
-            return parent:WaitForChild(childName)
-        end)
-        if not success or not result then
-            warn("noooooo: " .. childName)
+        local function SafeWaitForChild(parent, childName)
+            if not parent then return nil end
+            local success, result = pcall(function()
+                return parent:WaitForChild(childName)
+            end)
+            if not success or not result then
+                warn("noooooo: " .. childName)
+            end
+            return result
         end
-        return result
-    end
 
-    local function WaitChilds(path, ...)
-        local last = path
-        for _, child in {...} do
-            last = last:FindFirstChild(child) or SafeWaitForChild(last, child)
-            if not last then break end
+        local function WaitChilds(path, ...)
+            if not path then return nil end
+            local last = path
+            for _, child in {...} do
+                last = last:FindFirstChild(child) or SafeWaitForChild(last, child)
+                if not last then break end
+            end
+            return last
         end
-        return last
-    end
 
-    local VirtualInputManager = game:GetService("VirtualInputManager")
-    local CollectionService = game:GetService("CollectionService")
-    local ReplicatedStorage = game:GetService("ReplicatedStorage")
-    local TeleportService = game:GetService("TeleportService")
-    local RunService = game:GetService("RunService")
+        local VirtualInputManager = game:GetService("VirtualInputManager")
+        local CollectionService = game:GetService("CollectionService")
+        local ReplicatedStorage = game:GetService("ReplicatedStorage")
+        local TeleportService = game:GetService("TeleportService")
+        local RunService = game:GetService("RunService")
     local Players = game:GetService("Players")
     local Player = Players.LocalPlayer
 
@@ -9453,3 +9458,4 @@ if currentTime - lastNotificationTime >= notificationCooldown then
     })
     lastNotificationTime = currentTime
 end
+end)
