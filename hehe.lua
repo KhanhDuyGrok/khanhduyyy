@@ -1,11 +1,13 @@
--- Khởi tạo biến global
-if not getgenv().FastAttack then
-    getgenv().FastAttack = true
+-- Khởi tạo biến global an toàn
+local env = getgenv or (debug and debug.getenv) or _ENV
+if not env() then env = function() return _ENV end end
+if not env().FastAttack then
+    env().FastAttack = true
 end
 
 -- Bắt đầu script chính
 pcall(function()
-    if getgenv().FastAttack then
+    if env().FastAttack then
         local _ENV = getgenv()
 
         local function SafeWaitForChild(parent, childName)
