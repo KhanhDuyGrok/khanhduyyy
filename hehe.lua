@@ -1,20 +1,7 @@
--- Khởi tạo biến global an toàn
-local GetEnv = function()
-    if rawget(_G, "FastAttack") == nil then
-        rawset(_G, "FastAttack", true)
-    end
-    return _G
-end
+-- ============ INIT SCRIPT ============
+_G.FastAttack = true
 
-local GlobalEnv = GetEnv()
-
-if not GlobalEnv.FastAttack then
-    GlobalEnv.FastAttack = true
-end
-
--- Bắt đầu script chính
-pcall(function()
-    if GlobalEnv.FastAttack then
+if _G.FastAttack then
         local _ENV = GlobalEnv
 
         local function SafeWaitForChild(parent, childName)
@@ -9477,4 +9464,3 @@ if currentTime - lastNotificationTime >= notificationCooldown then
     })
     lastNotificationTime = currentTime
 end
-end)
