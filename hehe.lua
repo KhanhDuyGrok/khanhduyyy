@@ -1,14 +1,21 @@
 -- Khởi tạo biến global an toàn
-local env = getgenv or (debug and debug.getenv) or _ENV
-if not env() then env = function() return _ENV end end
-if not env().FastAttack then
-    env().FastAttack = true
+local GetEnv = function()
+    if rawget(_G, "FastAttack") == nil then
+        rawset(_G, "FastAttack", true)
+    end
+    return _G
+end
+
+local GlobalEnv = GetEnv()
+
+if not GlobalEnv.FastAttack then
+    GlobalEnv.FastAttack = true
 end
 
 -- Bắt đầu script chính
 pcall(function()
-    if env().FastAttack then
-        local _ENV = getgenv()
+    if GlobalEnv.FastAttack then
+        local _ENV = GlobalEnv
 
         local function SafeWaitForChild(parent, childName)
             if not parent then return nil end
@@ -154,10 +161,18 @@ local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
-if getgenv().Team == "Marines" then
-    ReplicatedStorage.Remotes.CommF_:InvokeServer("SetTeam", "Marines")
-elseif getgenv().Team == "Pirates" then
-    ReplicatedStorage.Remotes.CommF_:InvokeServer("SetTeam", "Pirates")
+if not GlobalEnv.Team then
+    GlobalEnv.Team = "Pirates"
+end
+
+if GlobalEnv.Team == "Marines" then
+    pcall(function()
+        ReplicatedStorage.Remotes.CommF_:InvokeServer("SetTeam", "Marines")
+    end)
+elseif GlobalEnv.Team == "Pirates" then
+    pcall(function()
+        ReplicatedStorage.Remotes.CommF_:InvokeServer("SetTeam", "Pirates")
+    end)
 end
 
 repeat
@@ -166,18 +181,22 @@ repeat
     local uiController = playerGui:FindFirstChild("UIController", true)
 
     if chooseTeam and chooseTeam.Visible and uiController then
-        for _, v in pairs(getgc(true)) do
-            if type(v) == "function" and getfenv(v).script == uiController then
-                local constant = getconstants(v)
-                pcall(function()
-                    if (constant[1] == "Pirates" or constant[1] == "Marines") and #constant == 1 then
-                        if constant[1] == getgenv().Team then
-                            v(getgenv().Team)
+        pcall(function()
+            for _, v in pairs(getgc(true) or {}) do
+                if type(v) == "function" then
+                    pcall(function()
+                        if getfenv(v).script == uiController then
+                            local constant = getconstants(v) or {}
+                            if (constant[1] == "Pirates" or constant[1] == "Marines") and #constant == 1 then
+                                if constant[1] == GlobalEnv.Team then
+                                    v(GlobalEnv.Team)
+                                end
+                            end
                         end
-                    end
-                end)
+                    end)
+                end
             end
-        end
+        end)
     end
 until player.Team
 pcall(function() 
@@ -7247,8 +7266,6 @@ Tabs.Teleport:AddButton({
                 Tween2(CFrame.new(-13274.528320313, 531.82073974609,-7579.22265625))
             elseif _G.SelectIsland=="Mansion" then
                 game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("requestEntrance",Vector3.new(-12468.5380859375, 375.0094299316406,-7554.62548828125))
-            elseif _G.SelectIsland=="Castle On The Sea" then
-                game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("requestEntrance",Vector3.new(-5075.50927734375, 314.5155029296875,-3150.0224609375))
             elseif _G.SelectIsland=="Haunted Castle" then
                 Tween2(CFrame.new(-9515.3720703125, 164.00624084473, 5786.0610351562))
             elseif _G.SelectIsland=="Ice Cream Island" then
