@@ -183,170 +183,174 @@ pcall(function()
         hookfunction(require(game:GetService("ReplicatedStorage").Effect.Container.Respawn), function() end) 
     end 
 end)
-local Fluent
-pcall(function()
-    Fluent = loadstring(game:HttpGet("https://raw.githubusercontent.com/hluuvn/BloxFruit/refs/heads/main/MainShadow.lua"))()
+
+-- ============ UI SYSTEM ============
+local UIConfig = {
+    Visible = true,
+    ToggleKey = Enum.KeyCode.RightControl
+}
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+local UserInputService = game:GetService("UserInputService")
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "ShadowHubGui"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = PlayerGui
+
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Size = UDim2.new(0, 520, 0, 600)
+MainFrame.Position = UDim2.new(0.5, -260, 0.5, -300)
+MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+MainFrame.BorderSizePixel = 0
+MainFrame.Parent = ScreenGui
+
+local TitleBar = Instance.new("TextLabel")
+TitleBar.Name = "TitleBar"
+TitleBar.Size = UDim2.new(1, 0, 0, 40)
+TitleBar.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+TitleBar.TextColor3 = Color3.fromRGB(255, 255, 255)
+TitleBar.TextSize = 18
+TitleBar.Font = Enum.Font.GothamBold
+TitleBar.Text = "⚔️ Shadow Hub - Blox Fruits"
+TitleBar.BorderSizePixel = 0
+TitleBar.Parent = MainFrame
+
+-- Nút đóng/mở
+local MinimizeButton = Instance.new("TextButton")
+MinimizeButton.Name = "MinimizeButton"
+MinimizeButton.Size = UDim2.new(0, 40, 0, 40)
+MinimizeButton.Position = UDim2.new(1, -40, 0, 0)
+MinimizeButton.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+MinimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+MinimizeButton.TextSize = 20
+MinimizeButton.Font = Enum.Font.GothamBold
+MinimizeButton.Text = "−"
+MinimizeButton.BorderSizePixel = 0
+MinimizeButton.Parent = TitleBar
+MinimizeButton.ZIndex = 10
+
+-- Biến để theo dõi trạng thái minimize
+local IsMinimized = false
+
+MinimizeButton.MouseButton1Click:Connect(function()
+    IsMinimized = not IsMinimized
+    if IsMinimized then
+        MainFrame.Size = UDim2.new(0, 520, 0, 40)
+        MinimizeButton.Text = "+"
+    else
+        MainFrame.Size = UDim2.new(0, 520, 0, 600)
+        MinimizeButton.Text = "−"
+    end
 end)
 
-if not Fluent then
-    warn("Không thể tải Fluent UI từ GitHub. Tạo UI mới...")
+local TabContainer = Instance.new("Frame")
+TabContainer.Name = "TabContainer"
+TabContainer.Size = UDim2.new(0, 120, 1, -40)
+TabContainer.Position = UDim2.new(0, 0, 0, 40)
+TabContainer.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+TabContainer.BorderSizePixel = 0
+TabContainer.Parent = MainFrame
+
+local ContentContainer = Instance.new("Frame")
+ContentContainer.Name = "ContentContainer"
+ContentContainer.Size = UDim2.new(1, -120, 1, -40)
+ContentContainer.Position = UDim2.new(0, 120, 0, 40)
+ContentContainer.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+ContentContainer.BorderSizePixel = 0
+ContentContainer.Parent = MainFrame
+
+local TabList = Instance.new("UIListLayout")
+TabList.Parent = TabContainer
+TabList.FillDirection = Enum.FillDirection.Vertical
+TabList.SortOrder = Enum.SortOrder.LayoutOrder
+
+local function CreateTabButton(parent, title, tabName, index)
+    local Button = Instance.new("TextButton")
+    Button.Name = tabName
+    Button.Size = UDim2.new(1, 0, 0, 40)
+    Button.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+    Button.TextColor3 = Color3.fromRGB(200, 200, 200)
+    Button.TextSize = 11
+    Button.Font = Enum.Font.GothamSemibold
+    Button.Text = title
+    Button.BorderSizePixel = 0
+    Button.LayoutOrder = index
+    Button.Parent = parent
     
-    -- Tạo UI mới không cần Fluent
-    local Players = game:GetService("Players")
-    local LocalPlayer = Players.LocalPlayer
-    local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
-
-    local ScreenGui = Instance.new("ScreenGui")
-    ScreenGui.Name = "ShadowHubGui"
-    ScreenGui.ResetOnSpawn = false
-    ScreenGui.Parent = PlayerGui
-
-    local MainFrame = Instance.new("Frame")
-    MainFrame.Name = "MainFrame"
-    MainFrame.Size = UDim2.new(0, 520, 0, 600)
-    MainFrame.Position = UDim2.new(0.5, -260, 0.5, -300)
-    MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    MainFrame.BorderSizePixel = 0
-    MainFrame.Parent = ScreenGui
-
-    local TitleBar = Instance.new("TextLabel")
-    TitleBar.Name = "TitleBar"
-    TitleBar.Size = UDim2.new(1, 0, 0, 40)
-    TitleBar.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-    TitleBar.TextColor3 = Color3.fromRGB(255, 255, 255)
-    TitleBar.TextSize = 18
-    TitleBar.Font = Enum.Font.GothamBold
-    TitleBar.Text = "⚔️ Shadow Hub - Blox Fruits"
-    TitleBar.BorderSizePixel = 0
-    TitleBar.Parent = MainFrame
-
-    local TabContainer = Instance.new("Frame")
-    TabContainer.Name = "TabContainer"
-    TabContainer.Size = UDim2.new(0, 120, 1, -40)
-    TabContainer.Position = UDim2.new(0, 0, 0, 40)
-    TabContainer.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-    TabContainer.BorderSizePixel = 0
-    TabContainer.Parent = MainFrame
-
-    local ContentContainer = Instance.new("Frame")
-    ContentContainer.Name = "ContentContainer"
-    ContentContainer.Size = UDim2.new(1, -120, 1, -40)
-    ContentContainer.Position = UDim2.new(0, 120, 0, 40)
-    ContentContainer.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-    ContentContainer.BorderSizePixel = 0
-    ContentContainer.Parent = MainFrame
-
-    local TabList = Instance.new("UIListLayout")
-    TabList.Parent = TabContainer
-    TabList.FillDirection = Enum.FillDirection.Vertical
-    TabList.SortOrder = Enum.SortOrder.LayoutOrder
-
-    local function CreateTabButton(parent, title, tabName, index)
-        local Button = Instance.new("TextButton")
-        Button.Name = tabName
-        Button.Size = UDim2.new(1, 0, 0, 40)
-        Button.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-        Button.TextColor3 = Color3.fromRGB(200, 200, 200)
-        Button.TextSize = 11
-        Button.Font = Enum.Font.GothamSemibold
-        Button.Text = title
-        Button.BorderSizePixel = 0
-        Button.LayoutOrder = index
-        Button.Parent = parent
-        
-        local TabContent = Instance.new("Frame")
-        TabContent.Name = tabName
-        TabContent.Size = UDim2.new(1, 0, 1, 0)
-        TabContent.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-        TabContent.BorderSizePixel = 0
-        TabContent.Visible = false
-        TabContent.Parent = ContentContainer
-        
-        Button.MouseButton1Click:Connect(function()
-            for _, child in pairs(ContentContainer:GetChildren()) do
-                if child:IsA("Frame") then
-                    child.Visible = false
-                end
+    local TabContent = Instance.new("Frame")
+    TabContent.Name = tabName
+    TabContent.Size = UDim2.new(1, 0, 1, 0)
+    TabContent.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+    TabContent.BorderSizePixel = 0
+    TabContent.Visible = false
+    TabContent.Parent = ContentContainer
+    
+    Button.MouseButton1Click:Connect(function()
+        for _, child in pairs(ContentContainer:GetChildren()) do
+            if child:IsA("Frame") then
+                child.Visible = false
             end
-            TabContent.Visible = true
-            
-            for _, btn in pairs(TabContainer:GetChildren()) do
-                if btn:IsA("TextButton") then
-                    btn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-                    btn.TextColor3 = Color3.fromRGB(200, 200, 200)
-                end
-            end
-            Button.BackgroundColor3 = Color3.fromRGB(60, 120, 220)
-            Button.TextColor3 = Color3.fromRGB(255, 255, 255)
-        end)
-        
-        return TabContent
-    end
-
-    local TabData = {
-        { Title = "📃Thông tin", Name = "Info" },
-        { Title = "🗡️Cày", Name = "Main" },
-        { Title = "⚔️Cày khác", Name = "Main1" },
-        { Title = "🌊Sự kiện", Name = "Sea" },
-        { Title = "🏹Item", Name = "Item" },
-        { Title = "⚙️Cài đặt", Name = "Setting" },
-        { Title = "🔫Server", Name = "Status" },
-        { Title = "🧬Chỉ số", Name = "Stats" },
-        { Title = "👨Người chơi", Name = "Player" },
-        { Title = "🕹️Dịch chuyển", Name = "Teleport" },
-        { Title = "🎰Buff", Name = "Visual" },
-        { Title = "🍍Trái", Name = "Fruit" },
-        { Title = "🔱Dungeon", Name = "Raid" },
-        { Title = "⚜️Tộc", Name = "Race" },
-        { Title = "⛩️Shop", Name = "Shop" },
-        { Title = "🧮Khác", Name = "Misc" },
-    }
-
-    local Tabs = {}
-    for index, tabInfo in ipairs(TabData) do
-        local TabContent = CreateTabButton(TabContainer, tabInfo.Title, tabInfo.Name, index)
-        Tabs[tabInfo.Name] = TabContent
-        
-        if index == 1 then
-            TabContent.Visible = true
-            TabContainer:FindFirstChild(tabInfo.Name).BackgroundColor3 = Color3.fromRGB(60, 120, 220)
-            TabContainer:FindFirstChild(tabInfo.Name).TextColor3 = Color3.fromRGB(255, 255, 255)
         end
-    end
-
-    local Options = {}
+        TabContent.Visible = true
+        
+        for _, btn in pairs(TabContainer:GetChildren()) do
+            if btn:IsA("TextButton") then
+                btn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+                btn.TextColor3 = Color3.fromRGB(200, 200, 200)
+            end
+        end
+        Button.BackgroundColor3 = Color3.fromRGB(60, 120, 220)
+        Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    end)
+    
+    return TabContent
 end
 
-Window = (not Fluent) and {CreateWindow = function() return {} end} or Fluent:CreateWindow({
-    Title = "Shadow Hub",
-    SubTitle="Blox Fruit", 
-    TabWidth=155, 
-    Theme="Amethyst",
-    Acrylic=true,
-    Size=UDim2.fromOffset(520, 320), 
-    MinimizeKey = Enum.KeyCode.LeftControl
-})
-local Tabs = Tabs or {
-
-Info=Window:AddTab({ Title="📃Thông tin" }),
-    Main=Window:AddTab({ Title="🗡️Cày" }),
-
-Main1=Window:AddTab({ Title="⚔️Cày khác" }),
-    Sea=Window:AddTab({ Title="🌊Sự kiện biển" }),
-    Item=Window:AddTab({ Title="🏹Lấy Item" }),
-    Setting=Window:AddTab({ Title="⚙️Cài đặt" }),
-    Status=Window:AddTab({ Title="🔫Máy chủ" }),
-    Stats=Window:AddTab({ Title="🧬Chỉ số" }),
-    Player=Window:AddTab({ Title="👨‍💻Người chơi" }),
-    Teleport=Window:AddTab({ Title="🕹️Dịch chuyển" }),
-    Visual=Window:AddTab({ Title="🎰Buff Ảo" }),
-    Fruit=Window:AddTab({ Title="🍍Trái/👁️Esp" }),
-    Raid=Window:AddTab({ Title="🔱Dungeon" }),
-    Race=Window:AddTab({ Title="⚜️Tộc V4" }),
-    Shop=Window:AddTab({ Title="⛩️Cửa hàng" }),
-    Misc=Window:AddTab({ Title="🧮Khác" }),
+local TabData = {
+    { Title = "📃Thông tin", Name = "Info" },
+    { Title = "🗡️Cày", Name = "Main" },
+    { Title = "⚔️Cày khác", Name = "Main1" },
+    { Title = "🌊Sự kiện", Name = "Sea" },
+    { Title = "🏹Item", Name = "Item" },
+    { Title = "⚙️Cài đặt", Name = "Setting" },
+    { Title = "🔫Server", Name = "Status" },
+    { Title = "🧬Chỉ số", Name = "Stats" },
+    { Title = "👨Người chơi", Name = "Player" },
+    { Title = "🕹️Dịch chuyển", Name = "Teleport" },
+    { Title = "🎰Buff", Name = "Visual" },
+    { Title = "🍍Trái", Name = "Fruit" },
+    { Title = "🔱Dungeon", Name = "Raid" },
+    { Title = "⚜️Tộc", Name = "Race" },
+    { Title = "⛩️Shop", Name = "Shop" },
+    { Title = "🧮Khác", Name = "Misc" },
 }
-local Options = Fluent.Options
+
+local Tabs = {}
+for index, tabInfo in ipairs(TabData) do
+    local TabContent = CreateTabButton(TabContainer, tabInfo.Title, tabInfo.Name, index)
+    Tabs[tabInfo.Name] = TabContent
+    
+    if index == 1 then
+        TabContent.Visible = true
+        TabContainer:FindFirstChild(tabInfo.Name).BackgroundColor3 = Color3.fromRGB(60, 120, 220)
+        TabContainer:FindFirstChild(tabInfo.Name).TextColor3 = Color3.fromRGB(255, 255, 255)
+    end
+end
+
+-- Toggle UI visibility
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    if input.KeyCode == UIConfig.ToggleKey then
+        UIConfig.Visible = not UIConfig.Visible
+        ScreenGui.Enabled = UIConfig.Visible
+    end
+end)
+
+local Options = {}
 local id = game.PlaceId
 if id==2753915549 then Sea1=true; elseif id==4442272183 then Sea2=true; elseif id==7449423635 then Sea3=true; else game:Shutdown() end;
 game:GetService("Players").LocalPlayer.Idled:connect(function()
